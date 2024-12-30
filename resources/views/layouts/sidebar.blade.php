@@ -17,7 +17,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
-        <a class="nav-link" href="{{ route('dashboard') }}">
+        <a class="nav-link" href="{{ route('admin.dashboard') }}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
@@ -31,7 +31,7 @@
     </div>
 
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('users') }}">
+        <a class="nav-link" href="{{ route('users.index') }}">
             <i class="far fa-user"></i>
             <!-- <i class="fas fa-fw fa-cog"></i> -->
             <span>All Users</span></a>
@@ -83,7 +83,7 @@
     
      <!-- Nav Item - Tables -->
      <li class="nav-item">
-        <a class="nav-link" href="{{ route('equipements') }}">
+        <a class="nav-link" href="{{ route('materials.index') }}">
             <!-- <i class="fas fa-fw fa-table"></i> -->
             <i class="fas fa-mobile-alt"></i>
             <span>All Materials</span></a>
@@ -100,8 +100,8 @@
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <!-- <h6 class="collapse-header">Login Screens:</h6> -->
-                <a class="collapse-item" href="{{ route('maintenance') }}">Maintenance Requests</a>
-                <a class="collapse-item" href="{{ route('requests') }}">Equipment Requests</a>
+                <a class="collapse-item" href="{{ route('requests.index') }}">Equipment Requests</a>
+                <a class="collapse-item" href="{{ route('maintenances.index') }}">Maintenance Requests</a>
                 <!-- <a class="collapse-item" href="forgot-password.html">Forgot Password</a> -->
                 <!-- <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Other Pages:</h6>
