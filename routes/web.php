@@ -21,9 +21,12 @@ Route::prefix('admin')->group(function () {
 
     // CRUD pour les demandes
     Route::resource('requests', ARequestController::class);
+    Route::get('requests/accepte/{id}', [ARequestController::class,'accepte'])->name('requests.accepte');
+    Route::get('requests/deny/{id}', [ARequestController::class,'deny'])->name('requests.deny');
 
     // CRUD pour les maintenances
     Route::resource('maintenances', AMaintenanceController::class);
+    Route::get('maintenances/finishMaintenance/{Mid}', [AMaintenanceController::class,"finish"])->where(['Mid'=> '[0-9]+'])->name('maintenances.finish');
 });
 
 
@@ -99,3 +102,30 @@ Route::prefix('admin')->group(function () {
 //     Route::get('maintenances', [UMaintenanceRequestController::class, 'userMaintenances'])->name('user.maintenances.index');
 // });
 
+
+use App\Http\Controllers\User\UDashboardController;//all materials (can do request btn)
+use App\Http\Controllers\User\UMyMaterialController;// the material i occupe (can do maintenance btn)
+use App\Http\Controllers\User\UMaterialRequestController;//the material i request having /i demande : in attends / accepted / rejected
+use App\Http\Controllers\User\UMaintenanceRequestController;//the material i send to maintenance: in progress / done
+
+
+Route::prefix('user')->group(function () {//->middleware(['auth', 'role:user'])
+
+    // Liste des matériaux et demande de matériel
+    Route::get('dashboard', [UDashboardController::class, 'index'])->name('user.dashboard');
+    Route::post('materials/request', [UMaterialRequestController::class, 'store'])->name('user.materials.request');
+
+    
+    
+    // Liste des matériaux et demande de matériel
+    // Route::get('materials', [UMaterialRequestController::class, 'index'])->name('user.materials.index');
+    // Route::post('materials/request', [UMaterialRequestController::class, 'store'])->name('user.materials.request');
+    
+    // Liste des matériaux de l'utilisateur et demande de maintenance
+    Route::get('my-materials', [UMyMaterialController::class, 'index'])->name('user.my-materials.index');
+    Route::post('my-materials/maintenance', [UMaintenanceRequestController::class, 'store'])->name('user.my-materials.maintenance');
+    
+    // Demandes de maintenance et de matériel de l'utilisateur
+    Route::get('requests', [UMaterialRequestController::class, 'index'])->name('user.requests.index');//userRequests
+    Route::get('maintenances', [UMaintenanceRequestController::class, 'index'])->name('user.maintenances.index');//userMaintenances
+});

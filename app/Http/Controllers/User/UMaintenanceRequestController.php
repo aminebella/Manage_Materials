@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,31 +9,16 @@ use App\Models\Maintenance;
 use App\Models\User;
 use App\Models\Material;
 
-class AMaintenanceController extends Controller
+class UMaintenanceRequestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $Allmaintenances= Maintenance::with(['user', 'material'])->get();
-        $maintenances = Maintenance::with(['user', 'material'])->paginate(5);
-        $search=$request->input('search');
-        if($search){
-            $maintenances = Maintenance::with(['user', 'material'])->whereRelation('material', 'name', 'like', '%' . $search . '%')->paginate(5);
-        }
-
-        $filter=$request->input('filter');
-        $order=$request->input('order');
-        
-        if($filter && $order){
-            if($filter==="created_at" || $filter==="updated_at"){
-                $maintenances=Maintenance::with(['user', 'material'])->orderBy($filter,$order)->paginate(5);
-            }elseif($filter==="status"){
-                $maintenances=Maintenance::with(['user', 'material'])->where($filter, $order)->paginate(5);
-            }
-        }
-        return view('admin.maintenances.maintenance', compact('maintenances','Allmaintenances'));
+        $maintenances = Maintenance::with(['user', 'material'])->get();
+        $maintenances = Maintenance::paginate(5);
+        return view('user.MyMaintenances.Mymaintenances', compact('maintenances'));
     }
 
     /**
@@ -41,10 +26,8 @@ class AMaintenanceController extends Controller
      */
     public function create()
     {
-        // $users = User::all();
-        $users = User::where('id_user',"!=",1)->get();
-        // $materials = Material::all();
-        $materials = Material::where('id_material',"!=",1)->get();
+        $users = User::all();
+        $materials = Material::all();
         return view('admin.maintenances.create', compact('users', 'materials'));
     }
 
@@ -56,14 +39,10 @@ class AMaintenanceController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id_user',
             'material_id' => 'required|exists:materials,id_material',
-            // 'status' => 'required|in:en cours,terminé',
+            'status' => 'required|in:en cours,terminé',
         ]);
-        // Maintenance::create($validated);
-        Maintenance::create([
-            'user_id' => $request->input('user_id'),
-            'material_id' => $request->input('material_id'),
-            'status' => 'en cours',
-        ]);
+
+        Maintenance::create($validated);
 
         return redirect()->route('maintenances.index')->with('success', 'Maintenance created successfully.');
     }
@@ -113,16 +92,5 @@ class AMaintenanceController extends Controller
         $maintenance->delete();
 
         return redirect()->route('maintenances.index')->with('success', 'Maintenance deleted successfully.');
-    }
-
-    public function finish($Mid){//Request $request
-        $maintenance=Maintenance::findOrFail($Mid);
-
-        $maintenance->update([
-            'status' => "terminé",
-            'updated_at'=> now(),
-        ]);
-
-        return redirect()->route('maintenances.index')->with('success','the material has finished the maintenance');
     }
 }

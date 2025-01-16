@@ -1,6 +1,6 @@
-@extends('structure')
+@extends('user.structureUser')
 
-@section('title', 'Dashboard')
+@section('title', 'equipements')
 
 @section('content')
 <!-- Begin Page Content -->
@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <!-- Content Row -->
+    {{-- <!-- Content Row -->
 
     <div class="row">
 
@@ -329,8 +329,75 @@
             </div>
 
         </div>
-    </div>
+    </div> --}}
+</div>
 
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Liste des materielles</h6>
+    </div>
+    <div class="card-body">
+        {{-- <a href="{{ route('materials.create') }}" class="btn btn-primary">Ajouter un materielle</a> --}}
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>type</th>
+                        <th>brand</th>
+                        <th>name</th>
+                        <th>status</th>
+                        <th>user name</th>
+                        <th>Actions de Request</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>type</th>
+                        <th>brand</th>
+                        <th>name</th>
+                        <th>status</th>
+                        <th>user name</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach ($materials as $material)
+                        <tr>
+                            <td>{{ $material->id_material }}</td>
+                            <td>{{ $material->type->type_name  }} </td>
+                            <td>{{ $material->brand->brand_name  }}</td>
+                            <td>{{ $material->name }}</td>
+                            <td>{{ $material->status }}</td>
+                            <td>{{ $material->user->firstname }} {{ $material->user->lastname }}</td>
+                            <td>
+                                <form action="{{ route('user.materials.request') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="material_id" value="{{ $material->id_material }}">
+                                    <button type="submit" class="btn btn-primary">Demander</button>
+                                </form>
+                                {{-- <a href="{{ route('materials.edit', $material->id_material) }}" class="btn btn-warning">edit</a>
+                                <form action="{{ route('materials.destroy', $material->id_material) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')" class="btn btn-danger" >delete</button>
+                                </form> --}}
+                                
+                                {{-- <a href="{{ route('materials.show', $material->id_material) }}" class="btn btn-info">show</a> --}}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination links -->
+        <div>
+            {{ $materials->links() }}
+        </div>
+
+    </div>
 </div>
 <!-- /.container-fluid -->
 @endsection

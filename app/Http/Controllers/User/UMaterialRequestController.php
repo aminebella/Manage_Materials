@@ -1,34 +1,38 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Auth;
+
 use App\Models\Request;
 use App\Models\User;
 use App\Models\Material;
-use Illuminate\Http\Request as HttpRequest;
 
-class ARequestController extends Controller
+
+class UMaterialRequestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $requests = Request::with(['user', 'material'])->get();
-        $requests = Request::paginate(5);
-        return view('admin.requests.requests', compact('requests'));
+        // $requests = Request::with(['user', 'material'])->get();
+        // $requests = Request::paginate(5);
+        $requests = Auth::user()->requests;
+        return view('user.MyRequests.Myrequests', compact('requests'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        $users = User::all();
-        $materials = Material::all();
-        return view('admin.requests.create', compact('users', 'materials'));
-    }
+    // public function create()
+    // {
+    //     $users = User::all();
+    //     $materials = Material::all();
+    //     return view('admin.requests.create', compact('users', 'materials'));
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -36,14 +40,18 @@ class ARequestController extends Controller
     public function store(HttpRequest $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id_user',
             'material_id' => 'required|exists:materials,id_material',
-            'status' => 'required|in:en attente,accepté,refusé',
         ]);
 
-        Request::create($validated);
+        // Créer une demande
+        Request::create([
+            'user_id' => Auth::id(),
+            'material_id' => $validated['material_id'],
+            'status' => 'en attente',
+        ]);
 
-        return redirect()->route('requests.index')->with('success', 'Request created successfully.');
+        return redirect()->route('user.dashboard')->with('success', 'Demande envoyée.');
+
     }
 
     /**
@@ -92,23 +100,5 @@ class ARequestController extends Controller
         $request->delete();
 
         return redirect()->route('requests.index')->with('success', 'Request deleted successfully.');
-    }
-
-    public function accepte(string $id)
-    {
-        $request = Request::findOrFail($id);
-        $request->update([
-            'status'=>"accepté",
-        ]);
-        return redirect()->route('requests.index')->with('success', 'The Request is accepted successfully.');
-    }
-
-    public function deny(string $id)
-    {
-        $request = Request::findOrFail($id);
-        $request->update([
-            'status'=> "refusé",
-        ]);
-        return redirect()->route('requests.index')->with('success', 'The Request is Deny.');
     }
 }

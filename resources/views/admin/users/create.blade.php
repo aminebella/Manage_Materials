@@ -1,38 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-</head>
-<body>
-    <h1>Créer un Utilisateur</h1>
-    <form action="{{ route('users.store') }}" method="POST">
-        @csrf
-        <input type="text" name="firstname" placeholder="Prénom" required>
-        <input type="text" name="lastname" placeholder="Nom" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Mot de passe" required>
-        <label for="sector_id">Secteur</label>
-        <select name="sector_id" id="sector_id" class="form-control" required>
-            <option value="" disabled selected>-- Sélectionnez un secteur --</option>
-            @foreach($sectors as $sector)
-                <option value="{{ $sector->id_sector }}">{{ $sector->sector_name }}</option>
-            @endforeach
-        </select>
+@extends('structure')
+
+@section('title', 'users')
+
+@section('content')
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h1>Create a New User</h1>
+        <form action="{{ route('users.store') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" class="form-control" value="{{ old('firstname') }}" placeholder="Enter your First Name" required>
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" class="form-control" value="{{ old('lastname') }}" placeholder="Enter your Last Name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your Unique Email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your Password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sector_id">Sector:</label>
+                <select id="sector_id" name="sector_id" class="form-control" required>
+                    <option value="" disabled selected>-- Select a Sector --</option>
+                    @foreach($sectors as $sector)
+                        <option value="{{ $sector->id_sector }}">{{ $sector->sector_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="role">User Type:</label>
+                <select id="role" name="role" class="form-control" required>
+                    <option value="" disabled selected>-- Select a Type --</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">Normal User</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Save User</button>
+            <a href="{{ route('users.index') }}" class="btn btn-secondary">Back</a>
+        </form>
+
         {{-- @error('sector_id')
-            <span class="text-danger">{{ $message }}</span>
+                <span class="text-danger">{{ $message }}</span>
         @enderror --}}
-        <select name="role" required>
-            <option value="admin">Admin</option>
-            <option value="user">Utilisateur</option>
-        </select>
-        <button type="submit">Créer</button>
-    </form>
 
-    <a href="{{ route('users.index') }}" class="btn btn-secondary">Retour</a>
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </div>
+</div>
 
-</body>
-</html>
+@endsection

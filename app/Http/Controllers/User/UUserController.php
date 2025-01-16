@@ -12,21 +12,11 @@ class AUserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $Allusers=User::all();
+        // $users = User::all();
         $users = User::paginate(10);
-
-        $search=$request->input("search");
-        if($search){
-            $users=User::where("firstname","like",'%'.$search.'%')->orwhere("lastname",'like','%'.$search.'%')->orWhereRaw("CONCAT(firstname, ' ', lastname) LIKE ?", ['%' . $search . '%'])->paginate(10);
-        }
-
-        $filter=$request->input("filter");
-        if($filter){
-            $users=User::where("role",$filter)->paginate(10);
-        }
-        return view('admin.users.users', compact('users','Allusers'));
+        return view('admin.users.users', compact('users'));
     }
 
     /**
@@ -55,7 +45,7 @@ class AUserController extends Controller
         $validated['password'] = bcrypt($validated['password']);
         User::create($validated);
 
-        return redirect()->route('users.index')->with('success', 'User has been created successfully.');
+        return redirect()->route('users.index')->with('success', 'Utilisateur créé avec succès.');
     }
 
     /**
@@ -75,7 +65,7 @@ class AUserController extends Controller
      */
     public function edit(string $id) //or User $user
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
         $sectors = Sector::all();
         return view('admin.users.edit', compact('user','sectors'));
         
@@ -90,19 +80,21 @@ class AUserController extends Controller
         $user = User::findOrFail($id);
 
         // Récupération du sector s'utilisateur
-        // $sector = Sector::with('users')->findOrFail($id);
+        $sector = Sector::with('users')->findOrFail($id);
 
         $validated = $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id_user . ',id_user',
+            'email' => 'required|email|unique:users', //email,' . $user->id_user,
             'sector_id'=>'required|exists:sectors,id_sector',
             'password' => 'nullable|min:6',
             'role' => 'required|string|in:admin,user',
         ]);
 
-        if (!empty($request->input('password'))) {
-            $validated['password'] = bcrypt($request->input('password'));
+       
+
+        if (!empty($validatedData['password'])) {
+            $validated['password'] = bcrypt($request->password);//$validated['password']
         } else {
             unset($validated['password']);
         }
@@ -111,11 +103,13 @@ class AUserController extends Controller
 
         //or 
         // $users->update([
-        //     'firstname'=>$request->firstname,
-        //     'lastname'=>$request->lastname,
-        //     'email'=>$request->email
+        //     'firstname'=>$request->name,
+        //     'lastname'=>$request->email,
+        //     'email'=>$request->password
         // ]);
-        return redirect()->route('users.index')->with('success', 'User Updated successfully.');
+
+
+        return redirect()->route('users.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
     /**
@@ -125,6 +119,6 @@ class AUserController extends Controller
     {
         $user=User::find($id);
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User has been deleted succesfully.');
+        return redirect()->route('users.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }
